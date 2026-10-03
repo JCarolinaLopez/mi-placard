@@ -1,0 +1,1013 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#5d2f55">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Mi Placard">
+<title>Mi Placard</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@500;600;700&family=Karla:ital,wght@0,400;0,500;0,700;1,400&display=swap">
+<style>
+  :root {
+    --bg: #f1ece4; --shell: #faf7f2; --panel: #ffffff; --panel-2: #f3eee6; --line: #e0d7ca;
+    --fg: #2d2622; --muted: #7d7067; --accent: #5d2f55; --accent-soft: #ead9e6; --accent-fg: #ffffff;
+    --ok: #5f7a3f; --ok-soft: #e3ead6; --warn: #b4582e; --warn-soft: #f6e0d3; --outline: #3a302a;
+    --shadow: 0 6px 20px rgba(60, 40, 30, .10);
+    --display: "Sora", "Segoe UI", system-ui, sans-serif; --body: "Karla", "Segoe UI", system-ui, sans-serif;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #17141a; --shell: #1f1b22; --panel: #272229; --panel-2: #2f2933; --line: #3d3542;
+      --fg: #ece6e8; --muted: #a399a1; --accent: #c98fc0; --accent-soft: #3d2b3a; --accent-fg: #1a1218;
+      --ok: #a4c47c; --ok-soft: #2d3a22; --warn: #e4906a; --warn-soft: #432a1e; --outline: #e8e0e4;
+      --shadow: 0 6px 20px rgba(0,0,0,.35); color-scheme: dark;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.45; padding-top: env(safe-area-inset-top, 0px); }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button { cursor: pointer; }
+  button:focus-visible, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  [hidden] { display: none !important; }
+  a { color: var(--accent); }
+
+  .shell { height: 100%; max-width: 460px; margin: 0 auto; background: var(--shell); display: flex; flex-direction: column; box-shadow: var(--shadow); }
+  header.top { padding: 14px 16px 10px; display: flex; align-items: center; justify-content: space-between; gap: 10px; border-bottom: 1px solid var(--line); }
+  header.top h1 { margin: 0; font-family: var(--display); font-size: 1.25rem; font-weight: 700; letter-spacing: -.01em; }
+  header.top .sub { font-size: .8rem; color: var(--muted); }
+  .icon-btn { background: var(--panel-2); border: 1px solid var(--line); border-radius: 999px; width: 36px; height: 36px; display: grid; place-items: center; padding: 0; }
+  .icon-btn svg { width: 18px; height: 18px; }
+
+  main { flex: 1; overflow-y: auto; padding: 14px 16px 24px; min-width: 0; -webkit-overflow-scrolling: touch; }
+  .tab { display: flex; flex-direction: column; gap: 16px; }
+  h2 { font-family: var(--display); font-size: 1.05rem; font-weight: 600; margin: 0; text-wrap: balance; }
+  h3 { font-family: var(--display); font-size: .95rem; font-weight: 600; margin: 0; }
+  .eyebrow { font-size: .72rem; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); font-weight: 700; }
+  .row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .between { justify-content: space-between; }
+  .muted { color: var(--muted); font-size: .85rem; }
+  p { margin: 0; }
+
+  nav.tabbar { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); background: var(--shell); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  nav.tabbar button { background: none; border: 0; padding: 10px 4px 8px; display: flex; flex-direction: column; align-items: center; gap: 3px; color: var(--muted); font-size: .72rem; font-weight: 700; letter-spacing: .02em; }
+  nav.tabbar button svg { width: 22px; height: 22px; }
+  nav.tabbar button.active { color: var(--accent); }
+
+  .btn { border: 1px solid var(--line); background: var(--panel); border-radius: 12px; padding: 10px 14px; font-weight: 700; font-size: .9rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; gap: 6px; color: var(--fg); }
+  .btn:hover { background: var(--panel-2); }
+  .btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .btn.primary:hover { filter: brightness(1.08); background: var(--accent); }
+  .btn.small { padding: 6px 10px; font-size: .8rem; border-radius: 10px; }
+  .btn.ghost { background: transparent; }
+  .btn.block { width: 100%; }
+  .btn.big { padding: 16px; font-size: 1rem; border-radius: 16px; }
+  .btn:disabled { opacity: .5; cursor: default; }
+  .btn svg { width: 18px; height: 18px; }
+
+  .chips { display: flex; gap: 6px; flex-wrap: wrap; }
+  .chip { border: 1px solid var(--line); background: var(--panel); border-radius: 999px; padding: 5px 11px; font-size: .8rem; font-weight: 500; }
+  .chip.on { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+  .scrollx { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 14px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+  .card.soft { background: var(--panel-2); border-style: dashed; }
+  .badge { font-size: .7rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--panel-2); color: var(--muted); white-space: nowrap; }
+  .badge.ok { background: var(--ok-soft); color: var(--ok); }
+  .badge.warn { background: var(--warn-soft); color: var(--warn); }
+  .badge.accent { background: var(--accent-soft); color: var(--accent); }
+
+  .tile { aspect-ratio: 1; border-radius: 12px; display: grid; place-items: center; position: relative; overflow: hidden; max-width: 100%; border: 1px solid var(--line); }
+  .tile svg { width: 62%; height: 62%; }
+  .tile svg path { stroke: var(--outline); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+  .tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; background: var(--panel); }
+  .tile .lab { position: absolute; left: 6px; right: 6px; bottom: 5px; font-size: .62rem; font-weight: 700; line-height: 1.15; text-align: center; color: var(--fg); background: color-mix(in srgb, var(--panel) 85%, transparent); border-radius: 6px; padding: 2px 4px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .collage { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .collage.c3 { grid-template-columns: repeat(3, 1fr); }
+  .collage.c2 { grid-template-columns: repeat(2, 1fr); }
+  .collage.c5 { grid-template-columns: repeat(5, 1fr); }
+
+  .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+  .garment { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 8px; display: flex; flex-direction: column; gap: 6px; text-align: left; min-width: 0; }
+  .garment .name { font-size: .78rem; font-weight: 700; line-height: 1.2; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+  .garment .meta { display: flex; gap: 4px; align-items: center; justify-content: space-between; }
+  .garment.dim { opacity: .55; }
+  .dots { display: inline-flex; gap: 2px; }
+  .dots i { width: 6px; height: 6px; border-radius: 50%; background: var(--line); display: inline-block; }
+  .dots i.f { background: var(--accent); }
+
+  .week { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; }
+  .day { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 6px; display: flex; flex-direction: column; gap: 5px; align-items: center; min-width: 0; }
+  .day .d { font-size: .7rem; font-weight: 700; color: var(--muted); }
+  .day.today .d { color: var(--accent); }
+  .day .mini { display: grid; grid-template-columns: 1fr 1fr; gap: 2px; width: 100%; }
+  .day .mini .tile { border-radius: 5px; }
+  .day .mini .tile svg { width: 70%; height: 70%; }
+  .day .empty { width: 100%; aspect-ratio: 1; border: 1px dashed var(--line); border-radius: 8px; display: grid; place-items: center; color: var(--muted); font-size: .8rem; }
+
+  .switch { display: inline-flex; align-items: center; gap: 8px; font-size: .88rem; font-weight: 500; }
+  .switch input { appearance: none; -webkit-appearance: none; width: 38px; height: 22px; border-radius: 999px; background: var(--line); position: relative; margin: 0; transition: background .2s; flex: 0 0 auto; }
+  .switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: var(--panel); transition: transform .2s; box-shadow: 0 1px 3px rgba(0,0,0,.2); }
+  .switch input:checked { background: var(--accent); }
+  .switch input:checked::after { transform: translateX(16px); }
+
+  .sheet-bg { position: fixed; inset: 0; background: rgba(20, 12, 18, .45); display: flex; align-items: flex-end; justify-content: center; z-index: 10; }
+  .sheet { background: var(--shell); width: 100%; max-width: 460px; max-height: 90%; overflow-y: auto; border-radius: 20px 20px 0 0; padding: 16px 16px calc(20px + env(safe-area-inset-bottom, 0px)); display: flex; flex-direction: column; gap: 14px; }
+  .sheet .handle { width: 40px; height: 4px; border-radius: 2px; background: var(--line); margin: 0 auto; }
+  .field { display: flex; flex-direction: column; gap: 5px; }
+  .field label { font-size: .78rem; font-weight: 700; color: var(--muted); }
+  .field input[type=text], .field input[type=number], .field select, .field textarea { border: 1px solid var(--line); background: var(--panel); border-radius: 10px; padding: 9px 11px; width: 100%; }
+  .swatches { display: flex; gap: 8px; flex-wrap: wrap; }
+  .sw { width: 30px; height: 30px; border-radius: 50%; border: 2px solid var(--line); padding: 0; }
+  .sw.on { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .picker { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 6px; }
+  .picker button { flex: 0 0 68px; background: none; border: 0; padding: 0; }
+  .picker button .tile { border: 2px solid var(--line); }
+  .picker button.on .tile { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .photo-row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .photo-row input[type=text] { flex: 1; min-width: 160px; }
+  .photo-box { width: 120px; }
+  .photo-box .tile { border-radius: 14px; }
+
+  .stepper { display: inline-flex; align-items: center; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+  .stepper button { width: 38px; height: 38px; border: 0; background: var(--panel); font-size: 1.1rem; font-weight: 700; }
+  .stepper span { min-width: 56px; text-align: center; font-family: var(--display); font-weight: 600; font-variant-numeric: tabular-nums; }
+
+  .check { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: .9rem; }
+  .check:last-child { border-bottom: 0; }
+  .check input { width: 18px; height: 18px; accent-color: var(--accent); margin: 0; flex: 0 0 auto; }
+  .check.done span { text-decoration: line-through; color: var(--muted); }
+  .check .mini-tile { width: 28px; height: 28px; border-radius: 7px; display: grid; place-items: center; border: 1px solid var(--line); flex: 0 0 auto; position: relative; overflow: hidden; }
+  .check .mini-tile svg { width: 70%; height: 70%; }
+  .check .mini-tile svg path { stroke: var(--outline); stroke-width: 2.5; stroke-linejoin: round; }
+  .check .mini-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  .stat { display: flex; flex-direction: column; gap: 2px; }
+  .stat b { font-family: var(--display); font-size: 1.3rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .stats .card { padding: 10px 12px; }
+  .list { display: flex; flex-direction: column; }
+  .list .item { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: .9rem; }
+  .list .item:last-child { border-bottom: 0; }
+  .list .item .mini-tile { width: 34px; height: 34px; border-radius: 8px; border: 1px solid var(--line); position: relative; overflow: hidden; display: grid; place-items: center; flex: 0 0 auto; }
+  .list .item .mini-tile svg { width: 70%; height: 70%; }
+  .list .item .mini-tile svg path { stroke: var(--outline); stroke-width: 2.5; }
+  .list .item .mini-tile img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+
+  .queue { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+  .queue .tile img { object-fit: cover; }
+  .queue .tile.done::after { content: "✓"; position: absolute; inset: 0; display: grid; place-items: center; background: rgba(95,122,63,.55); color: #fff; font-weight: 700; font-size: 1.4rem; }
+
+  .toast { position: fixed; left: 50%; bottom: calc(84px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--fg); color: var(--bg); padding: 10px 16px; border-radius: 999px; font-weight: 700; font-size: .85rem; box-shadow: var(--shadow); z-index: 20; opacity: 0; transition: opacity .2s; pointer-events: none; max-width: 90%; text-align: center; }
+  .toast.show { opacity: 1; }
+  .note { font-size: .78rem; color: var(--muted); text-align: center; padding: 6px 0 0; }
+  .link { background: none; border: 0; color: var(--accent); font-weight: 700; padding: 0; text-decoration: underline; }
+  .spinner { width: 16px; height: 16px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; animation: spin .8s linear infinite; display: inline-block; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="shell">
+  <header class="top">
+    <div>
+      <h1>Mi Placard</h1>
+      <div class="sub" id="sub"></div>
+    </div>
+    <div class="row" style="gap:6px">
+      <select class="btn small" id="season" aria-label="Temporada" style="padding:6px 10px;border-radius:999px">
+        <option value="auto">Auto</option>
+        <option value="primavera">Primavera</option>
+        <option value="verano">Verano</option>
+        <option value="otoño">Otoño</option>
+        <option value="invierno">Invierno</option>
+      </select>
+      <button class="icon-btn" id="settings-btn" aria-label="Ajustes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3h0a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8v0a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg></button>
+    </div>
+  </header>
+  <main id="main"></main>
+  <nav class="tabbar" id="tabbar">
+    <button data-tab="hoy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>Hoy</button>
+    <button data-tab="placard"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 3v18M7 8v2M17 8v2"/></svg>Placard</button>
+    <button data-tab="looks"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7l4-3 4 3 4-3 4 3v13H4z"/><path d="M12 4v16"/></svg>Looks</button>
+    <button data-tab="viajes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V4h6v3M9 11v6M15 11v6"/></svg>Viajes</button>
+  </nav>
+</div>
+<div id="sheet-root"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+(function () {
+  'use strict';
+  const KEY = 'mi-placard-v1';
+  const SEASONS = ['primavera', 'verano', 'otoño', 'invierno'];
+  const CATS = { top: 'Tops', bottom: 'Abajo', dress: 'Vestidos', outer: 'Abrigos', shoes: 'Calzado', acc: 'Accesorios' };
+  const CAT1 = { top: 'Top', bottom: 'Parte de abajo', dress: 'Vestido', outer: 'Abrigo', shoes: 'Calzado', acc: 'Accesorio' };
+  const CAT_ORDER = ['top', 'bottom', 'dress', 'outer', 'shoes', 'acc'];
+  const FORMAL = { 1: 'Casual', 2: 'Oficina', 3: 'Reunión' };
+  const HUES = {
+    blanco: { hex: '#f4f1ec', n: true }, negro: { hex: '#1c1b1b', n: true }, gris: { hex: '#8a8a8f', n: true },
+    marino: { hex: '#22304d', n: true }, beige: { hex: '#e2d3b6', n: true }, camel: { hex: '#bf8f5c', n: true },
+    denim: { hex: '#3b4f72', n: true }, nude: { hex: '#d7b89a', n: true }, marron: { hex: '#5a3d2b', n: true },
+    terracota: { hex: '#b5563a', n: false }, oliva: { hex: '#6b7a45', n: false }, bordo: { hex: '#6e2b3a', n: false },
+    celeste: { hex: '#9bbbd4', n: false }, lila: { hex: '#9f6b8c', n: false }, rojo: { hex: '#b8232f', n: false },
+    verde: { hex: '#2f6b4f', n: false }, amarillo: { hex: '#e2b640', n: false }, rosa: { hex: '#e3a5b4', n: false },
+    azul: { hex: '#2d5fa8', n: false }, estampado: { hex: '#8d7f96', n: false }
+  };
+  const ALLOWED = new Set(['oliva|terracota', 'celeste|terracota', 'lila|oliva', 'bordo|celeste', 'bordo|rosa', 'azul|rojo', 'amarillo|azul', 'azul|verde', 'celeste|rosa', 'oliva|rosa', 'bordo|verde']);
+  const SEASON_TEMP = { primavera: 18, verano: 28, otoño: 15, invierno: 9 };
+  const WARM = ['primavera', 'verano'], COLD = ['otoño', 'invierno'];
+  const EXTRAS = ['Ropa interior y medias', 'Pijama', 'Neceser', 'Cargador y auriculares', 'Documentos y tarjetas'];
+
+  // ---------- state ----------
+  function freshState() {
+    return { items: [], looks: [], worn: {}, capsules: [], checks: {}, tab: 'hoy', onlySeason: true, catFilter: 'all', meeting: false, nextId: 1,
+      settings: { season: 'auto', city: '', lat: null, lon: null }, weather: null, demo: false };
+  }
+  let state;
+  try { const raw = localStorage.getItem(KEY); state = raw ? JSON.parse(raw) : null; } catch (e) { state = null; }
+  if (!state || !state.items) state = freshState();
+  state.settings = Object.assign({ season: 'auto', city: '', lat: null, lon: null }, state.settings || {});
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) { toast('No se pudo guardar: el almacenamiento está lleno o bloqueado'); } }
+
+  // ---------- photos in IndexedDB ----------
+  const photos = new Map();
+  let db = null;
+  function openDb() {
+    return new Promise(res => {
+      if (!('indexedDB' in window)) return res(null);
+      const req = indexedDB.open('mi-placard', 1);
+      req.onupgradeneeded = () => req.result.createObjectStore('photos');
+      req.onsuccess = () => res(req.result);
+      req.onerror = () => res(null);
+    });
+  }
+  function dbPut(id, data) { return new Promise(res => { if (!db) return res(); const tx = db.transaction('photos', 'readwrite'); tx.objectStore('photos').put(data, id); tx.oncomplete = res; tx.onerror = res; }); }
+  function dbDel(id) { return new Promise(res => { if (!db) return res(); const tx = db.transaction('photos', 'readwrite'); tx.objectStore('photos').delete(id); tx.oncomplete = res; tx.onerror = res; }); }
+  function dbAll() {
+    return new Promise(res => {
+      if (!db) return res();
+      const tx = db.transaction('photos', 'readonly'); const st = tx.objectStore('photos');
+      const req = st.openCursor();
+      req.onsuccess = () => { const c = req.result; if (c) { photos.set(c.key, c.value); c.continue(); } else res(); };
+      req.onerror = () => res();
+    });
+  }
+  async function setPhoto(id, data) { if (data) { photos.set(id, data); await dbPut(id, data); } else { photos.delete(id); await dbDel(id); } }
+
+  // image helpers
+  function fileToDataUrl(file) { return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(file); }); }
+  function loadImage(src) { return new Promise((res, rej) => { const im = new Image(); im.onload = () => res(im); im.onerror = rej; im.src = src; }); }
+  async function shrink(src, max = 640) {
+    const im = await loadImage(src);
+    const s = Math.min(1, max / Math.max(im.width, im.height));
+    const c = document.createElement('canvas'); c.width = Math.round(im.width * s); c.height = Math.round(im.height * s);
+    const ctx = c.getContext('2d'); ctx.drawImage(im, 0, 0, c.width, c.height);
+    return { data: c.toDataURL('image/jpeg', 0.82), hue: guessHue(ctx, c.width, c.height) };
+  }
+  function guessHue(ctx, w, h) {
+    try {
+      const x0 = Math.floor(w * .3), y0 = Math.floor(h * .3), cw = Math.floor(w * .4), ch = Math.floor(h * .4);
+      const d = ctx.getImageData(x0, y0, cw, ch).data;
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let i = 0; i < d.length; i += 16) { r += d[i]; g += d[i + 1]; b += d[i + 2]; n++; }
+      r /= n; g /= n; b /= n;
+      let best = 'gris', bd = 1e9;
+      Object.entries(HUES).forEach(([k, v]) => {
+        if (k === 'estampado') return;
+        const rr = parseInt(v.hex.slice(1, 3), 16), gg = parseInt(v.hex.slice(3, 5), 16), bb = parseInt(v.hex.slice(5, 7), 16);
+        const dist = (rr - r) ** 2 + (gg - g) ** 2 + (bb - b) ** 2;
+        if (dist < bd) { bd = dist; best = k; }
+      });
+      return best;
+    } catch (e) { return null; }
+  }
+  // fetch an image through a CORS-friendly proxy so it can be stored offline
+  async function fetchImageData(url) {
+    try {
+      const prox = 'https://images.weserv.nl/?w=640&output=jpg&url=' + encodeURIComponent(url.replace(/^https?:\/\//, ''));
+      const r = await fetch(prox); if (!r.ok) throw new Error('proxy');
+      return await fileToDataUrl(await r.blob());
+    } catch (e) {
+      // second try: the site itself may allow cross-origin image use
+      const im = await new Promise((res, rej) => { const x = new Image(); x.crossOrigin = 'anonymous'; x.onload = () => res(x); x.onerror = rej; x.src = url; });
+      const c = document.createElement('canvas'); c.width = im.width; c.height = im.height;
+      c.getContext('2d').drawImage(im, 0, 0);
+      return c.toDataURL('image/jpeg', 0.9);
+    }
+  }
+  async function imageFromProductLink(link) {
+    const r = await fetch('https://api.microlink.io/?url=' + encodeURIComponent(link));
+    const j = await r.json();
+    const img = j && j.data && j.data.image && j.data.image.url;
+    if (!img) throw new Error('noimg');
+    return { img, title: j.data.title || '' };
+  }
+
+  // ---------- helpers ----------
+  const byId = id => state.items.find(i => i.id === id);
+  const hex = i => (HUES[i.hue] || HUES.gris).hex;
+  const isNeutral = i => (HUES[i.hue] || HUES.gris).n;
+  function esc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c])); }
+  function toast(msg) { const t = document.getElementById('toast'); t.textContent = msg; t.classList.add('show'); clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 2400); }
+  function iso(d) { return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0'); }
+  function autoSeason() {
+    const m = new Date().getMonth(); // 0-11
+    const south = state.settings.lat == null ? true : state.settings.lat < 0;
+    const north = ['invierno', 'invierno', 'primavera', 'primavera', 'primavera', 'verano', 'verano', 'verano', 'otoño', 'otoño', 'otoño', 'invierno'][m];
+    const flip = { invierno: 'verano', verano: 'invierno', primavera: 'otoño', otoño: 'primavera' };
+    return south ? flip[north] : north;
+  }
+  function season() { return state.settings.season === 'auto' ? autoSeason() : state.settings.season; }
+  function todayTemp() { const w = state.weather; return w && w.date === iso(new Date()) ? w.tmax : SEASON_TEMP[season()]; }
+  const PATH = {
+    top: '<path d="M18 8 L26 4 Q32 11 38 4 L46 8 L58 20 L50 28 L48 24 L48 58 L16 58 L16 24 L14 28 L6 20 Z"/>',
+    bottom: '<path d="M18 6 H46 L50 58 H38 L32 26 L26 58 H14 Z"/>',
+    dress: '<path d="M24 6 L32 12 L40 6 L44 22 L54 58 H10 L20 22 Z"/>',
+    outer: '<path d="M16 6 L32 14 L48 6 L58 20 L52 26 L52 58 H12 V26 L6 20 Z"/><path d="M32 14 L25 58 M32 14 L39 58" fill="none"/>',
+    shoes: '<path d="M6 40 C6 30 20 34 28 26 L36 28 L58 36 L58 46 H6 Z"/>',
+    acc: '<path d="M20 24 V16 Q32 4 44 16 V24" fill="none"/><path d="M10 24 H54 L50 56 H14 Z"/>'
+  };
+  function photoOf(i) { return (i.id && photos.get(i.id)) || i.imgUrl || i.preview || ''; }
+  function tile(i, label) {
+    if (!i) return '<div class="tile" style="background:var(--panel-2)"></div>';
+    const p = photoOf(i);
+    const img = p ? `<img src="${esc(p)}" alt="" loading="lazy" onerror="this.remove()">` : '';
+    return `<div class="tile" style="background:${hex(i)}22"><svg viewBox="0 0 64 64" fill="${hex(i)}">${PATH[i.cat] || PATH.top}</svg>${img}${label === false ? '' : `<span class="lab">${esc(i.name)}</span>`}</div>`;
+  }
+  function miniTile(i) {
+    const p = photoOf(i);
+    return `<span class="mini-tile" style="background:${hex(i)}22"><svg viewBox="0 0 64 64" fill="${hex(i)}">${PATH[i.cat]}</svg>${p ? `<img src="${esc(p)}" alt="" onerror="this.remove()">` : ''}</span>`;
+  }
+  function collage(ids, label) {
+    const items = ids.map(byId).filter(Boolean);
+    const n = items.length;
+    const cls = n <= 2 ? 'c2' : n === 3 ? 'c3' : n >= 5 ? 'c5' : '';
+    return `<div class="collage ${cls}">${items.map(i => tile(i, label)).join('')}</div>`;
+  }
+  function dots(f) { return `<span class="dots" title="${FORMAL[f]}">${[1, 2, 3].map(k => `<i class="${k <= f ? 'f' : ''}"></i>`).join('')}</span>`; }
+  function outfitName(ids) {
+    const it = ids.map(byId).filter(Boolean);
+    return it.filter(i => ['top', 'bottom', 'dress'].includes(i.cat)).map(i => i.name.toLowerCase()).join(' + ');
+  }
+
+  // ---------- outfit engine ----------
+  function colorsOk(pieces) {
+    const non = [...new Set(pieces.filter(p => !isNeutral(p)).map(p => p.hue))];
+    if (non.length <= 1) return true;
+    if (non.length === 2) return ALLOWED.has(non.sort().join('|'));
+    return false;
+  }
+  function recentIds(days) {
+    const set = new Set(); const d = new Date();
+    for (let k = 1; k <= days; k++) { const x = new Date(d); x.setDate(d.getDate() - k); (state.worn[iso(x)] || []).forEach(id => set.add(id)); }
+    return set;
+  }
+  function buildOutfits(pool, opts) {
+    const tops = pool.filter(i => i.cat === 'top'), bottoms = pool.filter(i => i.cat === 'bottom'), dresses = pool.filter(i => i.cat === 'dress');
+    const outers = pool.filter(i => i.cat === 'outer'), shoes = pool.filter(i => i.cat === 'shoes'), accs = pool.filter(i => i.cat === 'acc');
+    const recent = opts.recent || new Set();
+    const bases = [];
+    tops.forEach(t => bottoms.forEach(b => bases.push([t, b])));
+    dresses.forEach(d => bases.push([d]));
+    const outerOpts = opts.temp > 24 ? [null] : opts.temp < 16 ? outers : [null, ...outers];
+    const shoeOpts = shoes.length ? shoes : [null];
+    const out = [];
+    bases.forEach(base => shoeOpts.forEach(s => outerOpts.forEach(o => {
+      const pieces = [...base, s, o].filter(Boolean);
+      if (o === null && opts.temp < 16 && outers.length) return;
+      if (!colorsOk(pieces)) return;
+      const fs = pieces.map(p => p.formal);
+      const minF = Math.min(...fs), avg = fs.reduce((a, b) => a + b, 0) / fs.length;
+      if (opts.meeting && minF < 2) return;
+      if (!opts.meeting && avg < 1.6) return;
+      const acc = accs.filter(a => colorsOk([...pieces, a]) && (!opts.meeting || a.formal >= 2));
+      const a = acc.length ? acc[Math.floor(Math.random() * acc.length)] : null;
+      const all = a ? [...pieces, a] : pieces;
+      let score = avg * 2 + (opts.meeting ? minF : 0) + Math.random() * 1.5;
+      all.forEach(p => { if (recent.has(p.id)) score -= 1.6; score -= Math.min(p.uses || 0, 8) * 0.05; });
+      out.push({ items: all.map(p => p.id), score, formal: avg });
+    })));
+    out.sort((a, b) => b.score - a.score);
+    return out;
+  }
+  function pickDistinct(outfits, n) {
+    const res = [], usedTop = new Set(), usedBottom = new Set();
+    for (const o of outfits) {
+      const first = byId(o.items[0]), second = byId(o.items[1]);
+      const key2 = second && second.cat === 'bottom' ? second.id : null;
+      if (usedTop.has(first.id) || (key2 && usedBottom.has(key2))) continue;
+      res.push(o); usedTop.add(first.id); if (key2) usedBottom.add(key2);
+      if (res.length === n) break;
+    }
+    return res;
+  }
+  function available(s) { return state.items.filter(i => i.state === 'ok' && i.seasons.includes(s || season())); }
+
+  // ---------- capsule engine ----------
+  function buildCapsule(cfg) {
+    const seasons = cfg.clima === 'frio' ? COLD : cfg.clima === 'calido' ? ['verano'] : [season()];
+    const temp = cfg.clima === 'frio' ? 10 : cfg.clima === 'calido' ? 27 : 18;
+    const pool = state.items.filter(i => i.state === 'ok' && i.seasons.some(s => seasons.includes(s)));
+    const d = cfg.days;
+    const nB = d <= 3 ? 2 : d <= 5 ? 3 : 4, nT = Math.min(d, d <= 3 ? 3 : d <= 5 ? 4 : 5), nO = cfg.clima === 'frio' ? 2 : 1, nS = 2, nA = 2;
+    const formalFirst = (a, b) => (cfg.meeting ? b.formal - a.formal : 0) || (isNeutral(b) - isNeutral(a)) || ((b.uses || 0) - (a.uses || 0));
+    const bottoms = pool.filter(i => i.cat === 'bottom').sort(formalFirst);
+    const chosenB = []; bottoms.forEach(b => { if (chosenB.length < nB && (isNeutral(b) || chosenB.every(x => colorsOk([x, b])))) chosenB.push(b); });
+    const tops = pool.filter(i => i.cat === 'top').sort(formalFirst);
+    const chosenT = []; tops.forEach(t => { if (chosenT.length < nT && chosenB.every(b => colorsOk([b, t])) && (!cfg.meeting || t.formal >= 2 || chosenT.filter(x => x.formal >= 2).length >= 2)) chosenT.push(t); });
+    const outers = pool.filter(i => i.cat === 'outer').sort(formalFirst);
+    const chosenO = []; outers.forEach(o => { if (chosenO.length < nO && [...chosenB, ...chosenT].every(x => colorsOk([x, o]))) chosenO.push(o); });
+    const shoes = pool.filter(i => i.cat === 'shoes').sort(formalFirst);
+    const chosenS = []; shoes.forEach(s => { if (chosenS.length < nS && isNeutral(s) && !chosenS.some(x => x.formal === s.formal)) chosenS.push(s); });
+    if (chosenS.length < nS) shoes.forEach(s => { if (chosenS.length < nS && !chosenS.includes(s)) chosenS.push(s); });
+    const dress = cfg.meeting && d >= 4 ? pool.filter(i => i.cat === 'dress' && i.formal >= 3)[0] : null;
+    const accs = pool.filter(i => i.cat === 'acc').sort(formalFirst).slice(0, nA);
+    const items = [...chosenT, ...chosenB, dress, ...chosenO, ...chosenS, ...accs].filter(Boolean);
+    const outfits = buildOutfits(items, { temp, meeting: false });
+    const plan = []; const used = {};
+    const wear = ids => ids.reduce((s, id) => s + (used[id] || 0), 0);
+    for (let k = 0; k < d; k++) {
+      const wantMeeting = cfg.meeting && k === 0;
+      let cand = outfits.filter(o => (!wantMeeting || o.formal >= 2.5) && !used[o.items[0]]);
+      if (!cand.length) cand = outfits.filter(o => !used[o.items[0]]);
+      if (!cand.length) cand = outfits;
+      cand = cand.slice().sort((a, b) => wear(a.items) - wear(b.items) || b.score - a.score);
+      const o = cand[0] || { items: [] };
+      o.items.forEach(id => { used[id] = (used[id] || 0) + 1; });
+      plan.push(o.items);
+    }
+    return { id: 'c' + Date.now(), name: cfg.dest ? `${cfg.dest} · ${d} días` : `Viaje de ${d} días`, days: d, clima: cfg.clima, meeting: cfg.meeting, items: items.map(i => i.id), plan, combos: outfits.length, created: iso(new Date()) };
+  }
+
+  // ---------- weather (Open-Meteo, no key) ----------
+  const WCODE = c => c === 0 ? 'despejado' : c <= 2 ? 'parcialmente nublado' : c === 3 ? 'nublado' : c <= 48 ? 'niebla' : c <= 67 ? 'lluvia' : c <= 77 ? 'nieve' : c <= 82 ? 'chaparrones' : 'tormenta';
+  async function refreshWeather() {
+    const s = state.settings; if (s.lat == null || !navigator.onLine) return;
+    if (state.weather && state.weather.date === iso(new Date()) && state.weather.lat === s.lat) return;
+    try {
+      const u = `https://api.open-meteo.com/v1/forecast?latitude=${s.lat}&longitude=${s.lon}&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,weather_code&timezone=auto&forecast_days=1`;
+      const j = await (await fetch(u)).json();
+      state.weather = { date: iso(new Date()), lat: s.lat, tmax: Math.round(j.daily.temperature_2m_max[0]), tmin: Math.round(j.daily.temperature_2m_min[0]), pop: j.daily.precipitation_probability_max[0], txt: WCODE(j.daily.weather_code[0]) };
+      suggestions = null; save(); if (state.tab === 'hoy') render();
+    } catch (e) { /* offline or API down: keep season default */ }
+  }
+  async function geocode(name) {
+    const j = await (await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(name)}&count=1&language=es&format=json`)).json();
+    const r = j.results && j.results[0]; if (!r) throw new Error('nocity');
+    return { name: r.name + (r.country ? ', ' + r.country : ''), lat: r.latitude, lon: r.longitude };
+  }
+
+  // ---------- rendering ----------
+  const main = document.getElementById('main');
+  function render() {
+    document.querySelectorAll('#tabbar button').forEach(b => b.classList.toggle('active', b.dataset.tab === state.tab));
+    document.getElementById('season').value = state.settings.season;
+    const today = new Date();
+    const label = today.toLocaleDateString('es-AR', { weekday: 'long', day: 'numeric', month: 'long' });
+    document.getElementById('sub').textContent = label.charAt(0).toUpperCase() + label.slice(1) + ' · ' + season();
+    ({ hoy: renderHoy, placard: renderPlacard, looks: renderLooks, viajes: renderViajes })[state.tab]();
+    save();
+  }
+
+  let suggestions = null, suggestionsKey = '';
+  function renderHoy() {
+    if (!state.items.length) { main.innerHTML = emptyState(); return; }
+    const temp = todayTemp();
+    const w = state.weather && state.weather.date === iso(new Date()) ? state.weather : null;
+    const key = season() + state.meeting + temp + state.items.length;
+    if (!suggestions || suggestionsKey !== key) { suggestions = pickDistinct(buildOutfits(available(), { temp, meeting: state.meeting, recent: recentIds(5) }), 3); suggestionsKey = key; }
+    const todayKey = iso(new Date());
+    const wornToday = state.worn[todayKey];
+    const washing = state.items.filter(i => i.state === 'lavado').length;
+    const avail = available().length;
+    main.innerHTML = `
+      <div class="tab">
+        <div class="row between">
+          <div><div class="eyebrow">${w ? esc(state.settings.city || 'Clima de hoy') : 'Sin pronóstico'}</div>
+            <div style="font-weight:700">${w ? `${w.tmin}° a ${w.tmax}° · ${w.txt}${w.pop >= 50 ? ' · llevá paraguas' : ''}` : `Temporada ${season()} · <button class="link" data-act="settings">configurar ciudad</button>`}</div></div>
+          <label class="switch"><input type="checkbox" id="meeting" ${state.meeting ? 'checked' : ''}> Reunión importante</label>
+        </div>
+        ${wornToday ? `<div class="card" style="border-color:var(--ok)">
+          <div class="row between"><h2>Hoy vas con esto</h2><span class="badge ok">Anotado</span></div>
+          ${collage(wornToday)}
+          <div class="row"><button class="btn small" data-act="save-as-look">Guardar como look</button><button class="btn small ghost" data-act="undo-today">Cambiar</button></div>
+        </div>` : `
+        <div class="row between"><h2>¿Qué me pongo hoy?</h2><button class="btn small" data-act="reshuffle">Otras opciones</button></div>
+        ${suggestions.length ? suggestions.map((o, k) => `
+          <div class="card">
+            <div class="row between"><h3>Opción ${k + 1}</h3><span class="badge ${o.formal >= 2.5 ? 'accent' : ''}">${o.formal >= 2.5 ? 'Para reunión' : o.formal >= 2 ? 'Oficina' : 'Casual de oficina'}</span></div>
+            ${collage(o.items)}
+            <div class="muted">${esc(outfitName(o.items))}</div>
+            <button class="btn primary" data-act="wear" data-k="${k}">Usar hoy</button>
+          </div>`).join('') : `<div class="card"><p class="muted">No encontré combinaciones con lo que está disponible en ${season()}. Necesitás al menos un top y una parte de abajo (o un vestido) con esta temporada marcada, y que no estén en lavado.</p><button class="btn small" data-act="go-placard">Ir al placard</button></div>`}`}
+        <div>
+          <div class="row between" style="margin-bottom:8px"><h2>Esta semana</h2><span class="muted">Sin repetir</span></div>
+          ${weekStrip()}
+        </div>
+        <div class="stats">
+          <div class="card stat"><b>${avail}</b><span class="muted">disponibles</span></div>
+          <div class="card stat"><b>${washing}</b><span class="muted">en lavado</span></div>
+          <div class="card stat"><b>${state.items.filter(i => !i.uses).length}</b><span class="muted">sin usar</span></div>
+        </div>
+        ${insights()}
+        ${state.demo ? `<div class="note">Estás viendo prendas de ejemplo. <button class="link" data-act="clear-demo">Borrarlas y empezar con las mías</button></div>` : ''}
+      </div>`;
+  }
+  function insights() {
+    const used = state.items.filter(i => i.uses).sort((a, b) => b.uses - a.uses);
+    if (used.length < 3) return '';
+    const top = used.slice(0, 3), never = state.items.filter(i => !i.uses && i.seasons.includes(season()) && i.state === 'ok').slice(0, 3);
+    return `<div class="card"><h3>Lo que más usás</h3><div class="list">${top.map(i => `<div class="item">${miniTile(i)}<span style="flex:1">${esc(i.name)}</span><span class="badge">${i.uses} usos</span></div>`).join('')}</div>
+      ${never.length ? `<h3 style="margin-top:6px">Olvidadas esta temporada</h3><div class="list">${never.map(i => `<div class="item">${miniTile(i)}<span style="flex:1">${esc(i.name)}</span><button class="btn small" data-act="suggest-with" data-id="${i.id}">Armar look</button></div>`).join('')}</div>` : ''}</div>`;
+  }
+  function emptyState() {
+    return `<div class="tab">
+      <div class="card soft" style="gap:14px;padding:22px 18px">
+        <h2>Empecemos por tu placard</h2>
+        <p class="muted">Cargá tus prendas con una foto cada una. Una vez que tengas unas 10 o 15, la app te arma los looks de la mañana y las valijas de viaje.</p>
+        <button class="btn primary big" data-act="batch">Sesión de inventario con fotos</button>
+        <button class="btn" data-act="add">Cargar una prenda</button>
+        <button class="btn ghost small" data-act="load-demo">Probar con prendas de ejemplo</button>
+      </div>
+      <div class="card"><h3>Cómo conviene cargar</h3>
+        <p class="muted">Sacá las fotos con la prenda extendida sobre la cama o colgada, siempre con la misma luz. Si tenés el link de compra, pegalo y la foto se trae sola.</p></div>
+    </div>`;
+  }
+  function weekStrip() {
+    const d = new Date(); const dow = d.getDay();
+    const monday = new Date(d); monday.setDate(d.getDate() - ((dow + 6) % 7));
+    const names = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie'];
+    return `<div class="week">${names.map((n, k) => {
+      const day = new Date(monday); day.setDate(monday.getDate() + k);
+      const ids = state.worn[iso(day)];
+      const isToday = iso(day) === iso(d);
+      return `<div class="day ${isToday ? 'today' : ''}"><span class="d">${n}</span>${ids ? `<div class="mini">${ids.slice(0, 4).map(id => tile(byId(id), false)).join('')}</div>` : `<div class="empty">·</div>`}</div>`;
+    }).join('')}</div>`;
+  }
+
+  function renderPlacard() {
+    let list = state.items.slice();
+    if (state.onlySeason) list = list.filter(i => i.seasons.includes(season()));
+    if (state.catFilter !== 'all') list = list.filter(i => i.cat === state.catFilter);
+    list.sort((a, b) => CAT_ORDER.indexOf(a.cat) - CAT_ORDER.indexOf(b.cat) || a.id - b.id);
+    main.innerHTML = `
+      <div class="tab">
+        <div class="row between">
+          <h2>${list.length} prenda${list.length === 1 ? '' : 's'}</h2>
+          <div class="row" style="gap:6px"><button class="btn small" data-act="batch">Sesión de fotos</button><button class="btn primary small" data-act="add">+ Agregar</button></div>
+        </div>
+        <div class="row between">
+          <label class="switch"><input type="checkbox" id="onlySeason" ${state.onlySeason ? 'checked' : ''}> Solo ${season()}</label>
+          <span class="muted">${state.items.length} en total</span>
+        </div>
+        <div class="chips">
+          <button class="chip ${state.catFilter === 'all' ? 'on' : ''}" data-cat="all">Todo</button>
+          ${Object.entries(CATS).map(([k, v]) => `<button class="chip ${state.catFilter === k ? 'on' : ''}" data-cat="${k}">${v}</button>`).join('')}
+        </div>
+        ${list.length ? `<div class="grid">
+          ${list.map(i => `<button class="garment ${i.state !== 'ok' ? 'dim' : ''}" data-open="${i.id}">
+            ${tile(i, false)}
+            <span class="name">${esc(i.name)}</span>
+            <span class="meta">${dots(i.formal)}${i.state === 'lavado' ? '<span class="badge warn">Lavado</span>' : i.state === 'guardada' ? '<span class="badge">Guardada</span>' : `<span class="muted" style="font-size:.7rem">${i.uses || 0} usos</span>`}</span>
+          </button>`).join('')}
+        </div>` : `<div class="card soft"><p class="muted">${state.items.length ? 'Nada con estos filtros. Probá sacando el filtro de temporada.' : 'Todavía no cargaste prendas.'}</p></div>`}
+      </div>`;
+  }
+
+  function renderLooks() {
+    main.innerHTML = `
+      <div class="tab">
+        <div class="row between"><h2>Looks guardados</h2><button class="btn primary small" data-act="build-look" ${state.items.length ? '' : 'disabled'}>Armar look</button></div>
+        ${state.looks.length ? state.looks.map(l => {
+          const ok = l.items.every(id => byId(id) && byId(id).state === 'ok');
+          return `<div class="card">
+            <div class="row between"><h3>${esc(l.name)}</h3>${ok ? '<span class="badge ok">Listo para usar</span>' : '<span class="badge warn">Algo en lavado o falta</span>'}</div>
+            ${collage(l.items)}
+            <div class="row">
+              <button class="btn small primary" data-act="wear-look" data-id="${l.id}" ${ok ? '' : 'disabled'}>Usar hoy</button>
+              <button class="btn small ghost" data-act="del-look" data-id="${l.id}">Borrar</button>
+            </div>
+          </div>`;
+        }).join('') : `<div class="card soft"><p class="muted">Acá quedan las combinaciones que te gustan. Podés armarlas a mano o guardar la de hoy desde la pantalla Hoy.</p></div>`}
+      </div>`;
+  }
+
+  let capForm = { days: 3, dest: '', clima: 'templado', meeting: true };
+  let capResult = null;
+  function renderViajes() {
+    main.innerHTML = `
+      <div class="tab">
+        <h2>Armar cápsula de viaje</h2>
+        <div class="card">
+          <div class="row between">
+            <div class="field" style="flex:1"><label>Días de viaje</label>
+              <div class="stepper"><button data-act="days" data-d="-1" aria-label="Menos días">−</button><span>${capForm.days}</span><button data-act="days" data-d="1" aria-label="Más días">+</button></div>
+            </div>
+            <div class="field" style="flex:1"><label>Clima en destino</label>
+              <select id="clima"><option value="frio" ${capForm.clima === 'frio' ? 'selected' : ''}>Frío</option><option value="templado" ${capForm.clima === 'templado' ? 'selected' : ''}>Templado</option><option value="calido" ${capForm.clima === 'calido' ? 'selected' : ''}>Cálido</option></select>
+            </div>
+          </div>
+          <div class="field"><label>Destino (opcional)</label><input type="text" id="dest" placeholder="Ej. Buenos Aires" value="${esc(capForm.dest)}"></div>
+          <label class="switch"><input type="checkbox" id="capMeeting" ${capForm.meeting ? 'checked' : ''}> Tengo reuniones importantes</label>
+          <button class="btn primary block" data-act="build-cap" ${state.items.length ? '' : 'disabled'}>Armar cápsula</button>
+        </div>
+        ${capResult ? capsuleView(capResult, !!state.capsules.find(c => c.id === capResult.id)) : ''}
+        ${state.capsules.length ? `<h2>Cápsulas guardadas</h2>${state.capsules.map(c => `
+          <div class="card">
+            <div class="row between"><h3>${esc(c.name)}</h3><span class="badge">${c.items.length} prendas</span></div>
+            ${collage(c.items.slice(0, 8), false)}
+            <div class="row"><button class="btn small" data-act="open-cap" data-id="${c.id}">Abrir</button><button class="btn small" data-act="dup-cap" data-id="${c.id}">Duplicar</button><button class="btn small ghost" data-act="del-cap" data-id="${c.id}">Borrar</button></div>
+          </div>`).join('')}` : ''}
+      </div>`;
+  }
+  function capsuleView(c, saved) {
+    const items = c.items.map(byId).filter(Boolean);
+    const checks = state.checks[c.id] || {};
+    const checkRow = (key, label, item) => `<label class="check ${checks[key] ? 'done' : ''}">${item ? miniTile(item) : ''}<input type="checkbox" data-check="${key}" data-cap="${c.id}" ${checks[key] ? 'checked' : ''}><span>${esc(label)}</span></label>`;
+    if (!items.length) return `<div class="card"><p class="muted">No hay prendas disponibles para ese clima. Revisá las temporadas de tus prendas.</p></div>`;
+    return `
+      <div class="card" id="cap-card" style="border-color:var(--accent)">
+        <div class="row between"><h3>${esc(c.name)}</h3><span class="badge accent">${items.length} prendas · ${c.combos} combinaciones</span></div>
+        <div class="eyebrow">La cápsula</div>
+        ${collage(c.items)}
+        <div class="eyebrow" style="margin-top:6px">Plan por día</div>
+        ${c.plan.map((ids, k) => `<div class="row" style="flex-wrap:nowrap;align-items:flex-start"><span class="badge" style="min-width:52px;text-align:center">Día ${k + 1}</span><div style="flex:1;min-width:0">${collage(ids, false)}<div class="muted" style="margin-top:3px">${esc(outfitName(ids))}${c.meeting && k === 0 ? ' · reunión' : ''}</div></div></div>`).join('')}
+        <div class="eyebrow" style="margin-top:6px">Checklist de valija</div>
+        <div>
+          ${items.map(i => checkRow('i' + i.id, i.name, i)).join('')}
+          ${EXTRAS.map((e, k) => checkRow('x' + k, k === 0 ? e + ' (' + c.days + ' días)' : e, null)).join('')}
+        </div>
+        ${saved ? `<button class="btn ghost small" data-act="close-cap">Cerrar</button>` : `<div class="row"><button class="btn primary" data-act="save-cap">Guardar cápsula</button><button class="btn ghost" data-act="build-cap">Rearmar</button></div>`}
+      </div>`;
+  }
+
+  // ---------- sheets ----------
+  const sheetRoot = document.getElementById('sheet-root');
+  function openSheet(html) { sheetRoot.innerHTML = `<div class="sheet-bg" data-close><div class="sheet"><div class="handle"></div>${html}</div></div>`; }
+  function closeSheet() { sheetRoot.innerHTML = ''; }
+
+  function garmentSheet(id) {
+    const i = byId(id);
+    openSheet(`
+      <div class="row" style="flex-wrap:nowrap;align-items:flex-start"><div class="photo-box" style="flex:0 0 auto">${tile(i, false)}</div>
+        <div style="min-width:0"><h2>${esc(i.name)}</h2><div class="muted">${CAT1[i.cat]} · ${i.hue} · ${FORMAL[i.formal]}</div><div class="muted">${i.seasons.join(', ')}</div><div class="muted">${i.uses || 0} usos registrados${i.price ? ` · $${Math.round(i.price / Math.max(1, i.uses || 0))} por uso` : ''}</div></div></div>
+      <div class="row">
+        <button class="btn small" data-act="edit-item" data-id="${id}">Editar</button>
+        ${i.link ? `<a class="btn small" href="${esc(i.link)}" target="_blank" rel="noopener">Ver en la tienda</a>` : ''}
+        <button class="btn small" data-act="suggest-with" data-id="${id}">Armar look con esto</button>
+      </div>
+      <div class="row">
+        ${i.state === 'lavado' ? `<button class="btn primary" data-state="ok" data-id="${id}">Ya está limpia</button>` : `<button class="btn" data-state="lavado" data-id="${id}">Mandar a lavar</button>`}
+        ${i.state === 'guardada' ? `<button class="btn" data-state="ok" data-id="${id}">Sacar de guardado</button>` : `<button class="btn" data-state="guardada" data-id="${id}">Guardar de temporada</button>`}
+      </div>
+      <button class="btn ghost small" data-act="del-item" data-id="${id}" style="align-self:flex-start">Eliminar prenda</button>`);
+  }
+
+  let form = null;
+  function addSheet(id, preset) {
+    const i = id ? byId(id) : null;
+    form = i ? { id: i.id, name: i.name, cat: i.cat, hue: i.hue, seasons: i.seasons.slice(), formal: i.formal, link: i.link || '', price: i.price || '', photo: photos.get(i.id) || '', imgUrl: i.imgUrl || '' }
+             : Object.assign({ name: '', cat: 'top', hue: 'negro', seasons: [season()], formal: 2, link: '', price: '', photo: '', imgUrl: '' }, preset || {});
+    form.busy = false;
+    renderAddSheet();
+  }
+  function syncForm() {
+    const q = s => sheetRoot.querySelector(s);
+    if (q('#f-name')) form.name = q('#f-name').value;
+    if (q('#f-link')) form.link = q('#f-link').value.trim();
+    if (q('#f-price')) form.price = q('#f-price').value;
+  }
+  function renderAddSheet() {
+    const preview = { name: form.name || 'Vista previa', cat: form.cat, hue: form.hue, preview: form.photo || form.imgUrl };
+    openSheet(`
+      <h2>${form.id ? 'Editar prenda' : 'Nueva prenda'}</h2>
+      <div class="row" style="flex-wrap:nowrap;align-items:flex-start">
+        <div class="photo-box" style="flex:0 0 auto">${tile(preview, false)}</div>
+        <div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">
+          <label class="btn small" for="f-cam">Sacar foto</label><input type="file" id="f-cam" accept="image/*" capture="environment" hidden>
+          <label class="btn small" for="f-file">Elegir de la galería</label><input type="file" id="f-file" accept="image/*" hidden>
+          ${form.photo || form.imgUrl ? `<button class="btn small ghost" data-act="clear-img">Quitar foto</button>` : ''}
+        </div>
+      </div>
+      <div class="field"><label>Link de compra (opcional)</label>
+        <div class="photo-row"><input type="text" id="f-link" inputmode="url" placeholder="Pegá el link del producto" value="${esc(form.link)}"><button class="btn small" data-act="fetch-link" ${form.busy ? 'disabled' : ''}>${form.busy ? '<span class="spinner"></span>' : 'Traer foto'}</button></div>
+      </div>
+      <div class="field"><label>Nombre</label><input type="text" id="f-name" placeholder="Ej. Blazer azul" value="${esc(form.name)}"></div>
+      <div class="field"><label>Categoría</label><div class="chips">${Object.entries(CAT1).map(([k, v]) => `<button class="chip ${form.cat === k ? 'on' : ''}" data-f="cat" data-v="${k}">${v}</button>`).join('')}</div></div>
+      <div class="field"><label>Color principal</label><div class="swatches">${Object.entries(HUES).map(([k, h]) => `<button class="sw ${form.hue === k ? 'on' : ''}" style="background:${h.hex}" data-f="hue" data-v="${k}" title="${k}" aria-label="${k}"></button>`).join('')}</div><span class="muted">${form.hue}</span></div>
+      <div class="field"><label>Temporadas</label><div class="chips">${SEASONS.map(s => `<button class="chip ${form.seasons.includes(s) ? 'on' : ''}" data-f="season" data-v="${s}">${s}</button>`).join('')}<button class="chip" data-f="season" data-v="all">Todo el año</button></div></div>
+      <div class="field"><label>Formalidad</label><div class="chips">${[1, 2, 3].map(f => `<button class="chip ${form.formal === f ? 'on' : ''}" data-f="formal" data-v="${f}">${FORMAL[f]}</button>`).join('')}</div></div>
+      <div class="field"><label>Precio (opcional, para calcular costo por uso)</label><input type="number" id="f-price" inputmode="decimal" placeholder="0" value="${esc(form.price)}"></div>
+      <button class="btn primary block" data-act="save-item">${form.id ? 'Guardar cambios' : 'Guardar en el placard'}</button>`);
+  }
+  async function handlePhotoFile(file) {
+    try {
+      const raw = await fileToDataUrl(file);
+      const { data, hue } = await shrink(raw);
+      syncForm(); form.photo = data; form.imgUrl = '';
+      if (hue && !form.id && !form.hueTouched) form.hue = hue;
+      renderAddSheet(); toast('Foto cargada');
+    } catch (e) { toast('No pude leer esa imagen'); }
+  }
+  async function fetchFromLink() {
+    syncForm();
+    if (!form.link) { toast('Pegá primero el link del producto'); return; }
+    if (!/^https?:\/\//i.test(form.link)) form.link = 'https://' + form.link;
+    form.busy = true; renderAddSheet();
+    try {
+      const { img, title } = await imageFromProductLink(form.link);
+      if (!form.name && title) form.name = title.split(/[|\-–]/)[0].trim().slice(0, 40);
+      try {
+        const data = await fetchImageData(img);
+        const { data: small, hue } = await shrink(data);
+        form.photo = small; form.imgUrl = '';
+        if (hue && !form.hueTouched) form.hue = hue;
+      } catch (e) { form.imgUrl = img; form.photo = ''; }
+      toast('Foto traída de la tienda');
+    } catch (e) { toast('No pude sacar la foto de ese link. Probá sacarla vos o elegirla de la galería.'); }
+    form.busy = false; renderAddSheet();
+  }
+
+  // batch inventory session
+  let batch = null;
+  function batchSheet() { batch = batch || { queue: [], idx: 0, step: 'shoot' }; renderBatch(); }
+  function renderBatch() {
+    if (batch.step === 'shoot') {
+      openSheet(`
+        <h2>Sesión de inventario</h2>
+        <p class="muted">Sacá una foto por prenda, todas seguidas. Después las clasificás en un minuto cada una.</p>
+        <div class="row">
+          <label class="btn primary big" for="b-cam" style="flex:1">Sacar foto</label><input type="file" id="b-cam" accept="image/*" capture="environment" hidden>
+          <label class="btn big" for="b-file" style="flex:1">Galería</label><input type="file" id="b-file" accept="image/*" multiple hidden>
+        </div>
+        ${batch.queue.length ? `<div class="eyebrow">${batch.queue.length} foto${batch.queue.length === 1 ? '' : 's'} en cola</div>
+        <div class="queue">${batch.queue.map((q, k) => `<div class="tile ${q.done ? 'done' : ''}"><img src="${q.data}" alt=""></div>`).join('')}</div>
+        <button class="btn primary block" data-act="batch-classify">Clasificar ${batch.queue.filter(q => !q.done).length} prendas</button>` : ''}
+        <button class="btn ghost small" data-act="batch-end">Terminar sesión</button>`);
+    } else {
+      const pending = batch.queue.filter(q => !q.done);
+      if (!pending.length) { batch.step = 'shoot'; renderBatch(); return; }
+      const q = pending[0];
+      form = { name: '', cat: batch.lastCat || 'top', hue: q.hue || 'negro', seasons: [season()], formal: 2, link: '', price: '', photo: q.data, imgUrl: '', batchItem: q };
+      openSheet(`
+        <div class="row between"><h2>Clasificar</h2><span class="badge">${batch.queue.length - pending.length + 1} de ${batch.queue.length}</span></div>
+        <div class="row" style="flex-wrap:nowrap;align-items:flex-start">
+          <div class="photo-box" style="flex:0 0 auto">${tile({ name: '', cat: form.cat, hue: form.hue, preview: form.photo }, false)}</div>
+          <div class="field" style="flex:1"><label>Nombre</label><input type="text" id="f-name" placeholder="Ej. Camisa blanca" autofocus></div>
+        </div>
+        <div class="field"><label>Categoría</label><div class="chips">${Object.entries(CAT1).map(([k, v]) => `<button class="chip ${form.cat === k ? 'on' : ''}" data-bf="cat" data-v="${k}">${v}</button>`).join('')}</div></div>
+        <div class="field"><label>Color principal</label><div class="swatches">${Object.entries(HUES).map(([k, h]) => `<button class="sw ${form.hue === k ? 'on' : ''}" style="background:${h.hex}" data-bf="hue" data-v="${k}" aria-label="${k}"></button>`).join('')}</div><span class="muted">${form.hue}</span></div>
+        <div class="field"><label>Temporadas</label><div class="chips">${SEASONS.map(s => `<button class="chip ${form.seasons.includes(s) ? 'on' : ''}" data-bf="season" data-v="${s}">${s}</button>`).join('')}<button class="chip" data-bf="season" data-v="all">Todo el año</button></div></div>
+        <div class="field"><label>Formalidad</label><div class="chips">${[1, 2, 3].map(f => `<button class="chip ${form.formal === f ? 'on' : ''}" data-bf="formal" data-v="${f}">${FORMAL[f]}</button>`).join('')}</div></div>
+        <div class="row"><button class="btn primary" data-act="batch-save" style="flex:1">Guardar y siguiente</button><button class="btn ghost" data-act="batch-skip">Descartar foto</button></div>`);
+    }
+  }
+  async function addBatchFiles(files) {
+    for (const f of files) {
+      try { const raw = await fileToDataUrl(f); const { data, hue } = await shrink(raw); batch.queue.push({ data, hue, done: false }); } catch (e) { /* skip */ }
+    }
+    renderBatch();
+  }
+
+  let lookForm = null;
+  function lookSheet(preset) {
+    lookForm = { name: '', picks: preset || {} };
+    renderLookSheet();
+  }
+  function renderLookSheet() {
+    const pool = state.items.filter(i => i.state !== 'guardada');
+    const picked = Object.values(lookForm.picks).filter(Boolean);
+    const ok = picked.length >= 2 && colorsOk(picked.map(byId));
+    openSheet(`
+      <h2>Armar look</h2>
+      <div class="field"><label>Nombre</label><input type="text" id="l-name" placeholder="Ej. Martes de reuniones" value="${esc(lookForm.name)}"></div>
+      ${CAT_ORDER.map(cat => `
+        <div class="field"><label>${CATS[cat]}</label>
+          <div class="picker">${pool.filter(i => i.cat === cat).map(i => `<button class="${lookForm.picks[cat] === i.id ? 'on' : ''}" data-pick="${cat}" data-id="${i.id}" title="${esc(i.name)}">${tile(i)}</button>`).join('') || '<span class="muted">Nada en esta categoría</span>'}</div>
+        </div>`).join('')}
+      ${picked.length ? `<p class="muted">${ok ? 'Los colores combinan bien.' : picked.length < 2 ? 'Elegí al menos dos prendas.' : 'Ojo: hay más de un color fuerte, puede no combinar.'}</p>` : ''}
+      <div class="row"><button class="btn primary" data-act="save-look" ${picked.length >= 2 ? '' : 'disabled'} style="flex:1">Guardar look</button><button class="btn" data-act="wear-picks" ${picked.length >= 2 ? '' : 'disabled'}>Usar hoy</button></div>`);
+  }
+
+  function settingsSheet() {
+    const s = state.settings;
+    openSheet(`
+      <h2>Ajustes</h2>
+      <div class="field"><label>Ciudad para el pronóstico</label>
+        <div class="photo-row"><input type="text" id="s-city" placeholder="Ej. Buenos Aires" value="${esc(s.city)}"><button class="btn small" data-act="set-city">Buscar</button></div>
+        <span class="muted">${s.lat != null ? `Guardada: ${esc(s.city)} (${s.lat < 0 ? 'hemisferio sur' : 'hemisferio norte'})` : 'Sin ciudad: las sugerencias usan la temperatura típica de la temporada.'}</span>
+      </div>
+      <div class="field"><label>Copia de seguridad</label>
+        <div class="row"><button class="btn small" data-act="export">Exportar todo</button><label class="btn small" for="s-import">Importar</label><input type="file" id="s-import" accept="application/json" hidden></div>
+        <span class="muted">El archivo incluye prendas, fotos, looks, cápsulas e historial. Guardalo en Drive o mandátelo por mail.</span>
+      </div>
+      <div class="field"><label>Datos</label>
+        <div class="row">${state.items.length ? '' : `<button class="btn small" data-act="load-demo">Cargar prendas de ejemplo</button>`}<button class="btn small ghost" data-act="wipe">Borrar todo</button></div>
+      </div>
+      <p class="muted">Todo se guarda en este dispositivo. Nada se envía a ningún servidor, salvo el pronóstico y la búsqueda de fotos por link.</p>`);
+  }
+
+  // ---------- export / import ----------
+  function exportAll() {
+    const data = { version: 1, exported: new Date().toISOString(), state, photos: Object.fromEntries(photos) };
+    const blob = new Blob([JSON.stringify(data)], { type: 'application/json' });
+    const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'mi-placard-' + iso(new Date()) + '.json';
+    document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500);
+    toast('Copia exportada');
+  }
+  async function importAll(file) {
+    try {
+      const j = JSON.parse(await file.text());
+      if (!j.state || !j.state.items) throw new Error('bad');
+      state = j.state; state.tab = 'placard';
+      for (const [k, v] of Object.entries(j.photos || {})) await setPhoto(+k, v);
+      suggestions = null; closeSheet(); render(); toast('Copia importada');
+    } catch (e) { toast('Ese archivo no es una copia válida'); }
+  }
+
+  // ---------- demo data ----------
+  function loadDemo() {
+    const g = (name, cat, hue, seasons, formal) => ({ id: state.nextId++, name, cat, hue, seasons, formal, state: 'ok', uses: 0 });
+    const ALL = SEASONS;
+    const demo = [
+      g('Camisa blanca', 'top', 'blanco', ALL, 3), g('Blusa de seda marino', 'top', 'marino', ['primavera', 'otoño', 'invierno'], 3), g('Remera negra básica', 'top', 'negro', ALL, 1),
+      g('Blusa terracota', 'top', 'terracota', ['primavera', 'verano', 'otoño'], 2), g('Sweater fino camel', 'top', 'camel', COLD, 2), g('Camisa celeste rayada', 'top', 'celeste', WARM, 2),
+      g('Top verde oliva', 'top', 'oliva', WARM, 2), g('Polera gris', 'top', 'gris', ['invierno'], 2), g('Blusa blanca con lazo', 'top', 'blanco', ALL, 3),
+      g('Pantalón sastrero negro', 'bottom', 'negro', ALL, 3), g('Pantalón de vestir gris', 'bottom', 'gris', ALL, 3), g('Jean oscuro recto', 'bottom', 'denim', ALL, 1),
+      g('Pantalón crema wide', 'bottom', 'beige', WARM, 2), g('Falda lápiz marino', 'bottom', 'marino', ALL, 3), g('Pantalón verde oliva', 'bottom', 'oliva', COLD, 2),
+      g('Vestido camisero negro', 'dress', 'negro', ALL, 3), g('Vestido midi lila', 'dress', 'lila', WARM, 2),
+      g('Blazer negro', 'outer', 'negro', ALL, 3), g('Blazer de lino beige', 'outer', 'beige', WARM, 2), g('Tapado camel', 'outer', 'camel', COLD, 3), g('Campera de cuero', 'outer', 'negro', ['otoño', 'invierno', 'primavera'], 1),
+      g('Mocasines negros', 'shoes', 'negro', ALL, 3), g('Zapatillas blancas', 'shoes', 'blanco', ALL, 1), g('Botas negras', 'shoes', 'negro', COLD, 2), g('Sandalias nude', 'shoes', 'nude', WARM, 2), g('Stilettos nude', 'shoes', 'nude', ALL, 3),
+      g('Cartera negra', 'acc', 'negro', ALL, 3), g('Pañuelo de seda', 'acc', 'terracota', ALL, 2), g('Cinturón camel', 'acc', 'camel', ALL, 2)
+    ];
+    state.items = demo; state.demo = true; state.looks = []; state.worn = {}; suggestions = null;
+    state.tab = 'hoy'; render(); toast('Prendas de ejemplo cargadas');
+  }
+  async function clearDemo() {
+    for (const i of state.items) await setPhoto(i.id, null);
+    state.items = []; state.looks = []; state.worn = {}; state.capsules = []; state.checks = {}; state.demo = false; suggestions = null;
+    render(); toast('Listo, placard vacío para tus prendas');
+  }
+
+  // ---------- events ----------
+  document.getElementById('tabbar').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; state.tab = b.dataset.tab; render(); });
+  document.getElementById('season').addEventListener('change', e => { state.settings.season = e.target.value; suggestions = null; render(); });
+  document.getElementById('settings-btn').addEventListener('click', settingsSheet);
+
+  main.addEventListener('change', e => {
+    const t = e.target;
+    if (t.id === 'meeting') { state.meeting = t.checked; render(); }
+    if (t.id === 'onlySeason') { state.onlySeason = t.checked; render(); }
+    if (t.id === 'clima') capForm.clima = t.value;
+    if (t.id === 'capMeeting') capForm.meeting = t.checked;
+    if (t.dataset.check) { const c = state.checks[t.dataset.cap] || (state.checks[t.dataset.cap] = {}); c[t.dataset.check] = t.checked; t.closest('.check').classList.toggle('done', t.checked); save(); }
+  });
+  main.addEventListener('input', e => { if (e.target.id === 'dest') capForm.dest = e.target.value; });
+  main.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    const act = b.dataset.act;
+    if (b.dataset.cat) { state.catFilter = b.dataset.cat; render(); return; }
+    if (b.dataset.open) { garmentSheet(+b.dataset.open); return; }
+    if (act === 'reshuffle') { suggestions = null; render(); toast('Nuevas opciones'); }
+    if (act === 'wear') wear(suggestions[+b.dataset.k].items);
+    if (act === 'undo-today') { delete state.worn[iso(new Date())]; suggestions = null; render(); }
+    if (act === 'save-as-look') { const ids = state.worn[iso(new Date())]; state.looks.unshift({ id: 'l' + Date.now(), name: 'Look del ' + new Date().toLocaleDateString('es-AR', { day: 'numeric', month: 'short' }), items: ids.slice() }); save(); toast('Guardado en Looks'); }
+    if (act === 'add') addSheet();
+    if (act === 'batch') batchSheet();
+    if (act === 'settings') settingsSheet();
+    if (act === 'go-placard') { state.tab = 'placard'; state.onlySeason = false; render(); }
+    if (act === 'load-demo') loadDemo();
+    if (act === 'clear-demo') clearDemo();
+    if (act === 'build-look') lookSheet();
+    if (act === 'suggest-with') { const i = byId(+b.dataset.id); closeSheet(); lookSheet({ [i.cat]: i.id }); }
+    if (act === 'wear-look') { const l = state.looks.find(x => x.id === b.dataset.id); wear(l.items); state.tab = 'hoy'; render(); }
+    if (act === 'del-look') { state.looks = state.looks.filter(x => x.id !== b.dataset.id); render(); }
+    if (act === 'days') { capForm.days = Math.min(10, Math.max(2, capForm.days + (+b.dataset.d))); render(); }
+    if (act === 'build-cap') { capResult = buildCapsule(capForm); render(); setTimeout(() => document.getElementById('cap-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); }
+    if (act === 'save-cap') { state.capsules.unshift(capResult); toast('Cápsula guardada'); render(); }
+    if (act === 'close-cap') { capResult = null; render(); }
+    if (act === 'open-cap') { capResult = state.capsules.find(x => x.id === b.dataset.id); render(); setTimeout(() => document.getElementById('cap-card')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50); }
+    if (act === 'dup-cap') { const c = state.capsules.find(x => x.id === b.dataset.id); capForm = { days: c.days, dest: c.name.split(' · ')[0].replace(/^Viaje de \d+ días$/, ''), clima: c.clima, meeting: c.meeting }; capResult = buildCapsule(capForm); render(); toast('Cápsula rearmada con lo disponible hoy'); }
+    if (act === 'del-cap') { state.capsules = state.capsules.filter(x => x.id !== b.dataset.id); delete state.checks[b.dataset.id]; if (capResult && capResult.id === b.dataset.id) capResult = null; render(); }
+  });
+  function wear(ids) {
+    state.worn[iso(new Date())] = ids.slice();
+    ids.forEach(id => { const i = byId(id); if (i) i.uses = (i.uses || 0) + 1; });
+    suggestions = null; state.tab = 'hoy';
+    render(); toast('Listo, anotado para hoy');
+  }
+
+  sheetRoot.addEventListener('change', async e => {
+    const t = e.target;
+    if ((t.id === 'f-cam' || t.id === 'f-file') && t.files[0]) handlePhotoFile(t.files[0]);
+    if ((t.id === 'b-cam' || t.id === 'b-file') && t.files.length) addBatchFiles([...t.files]);
+    if (t.id === 's-import' && t.files[0]) importAll(t.files[0]);
+  });
+  sheetRoot.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && e.target.id === 's-city') { e.preventDefault(); setCity(); }
+    if (e.key === 'Enter' && e.target.id === 'f-name' && form && form.batchItem) { e.preventDefault(); batchSave(); }
+  });
+  async function setCity() {
+    const name = sheetRoot.querySelector('#s-city').value.trim(); if (!name) return;
+    try { const r = await geocode(name); state.settings = Object.assign(state.settings, { city: r.name, lat: r.lat, lon: r.lon }); state.weather = null; save(); settingsSheet(); toast('Ciudad guardada: ' + r.name); refreshWeather(); }
+    catch (e) { toast('No encontré esa ciudad'); }
+  }
+  function batchSave() {
+    form.name = (sheetRoot.querySelector('#f-name')?.value || '').trim();
+    if (!form.name) { toast('Ponele un nombre'); return; }
+    if (!form.seasons.length) { toast('Elegí al menos una temporada'); return; }
+    const id = state.nextId++;
+    state.items.push({ id, name: form.name, cat: form.cat, hue: form.hue, seasons: form.seasons, formal: form.formal, state: 'ok', uses: 0 });
+    setPhoto(id, form.photo);
+    form.batchItem.done = true; batch.lastCat = form.cat;
+    save(); toast('Guardada: ' + form.name); renderBatch();
+  }
+  sheetRoot.addEventListener('click', async e => {
+    if (e.target.hasAttribute('data-close')) { closeSheet(); render(); return; }
+    const b = e.target.closest('button'); if (!b) return;
+    const act = b.dataset.act;
+    if (b.dataset.state) { const i = byId(+b.dataset.id); i.state = b.dataset.state; closeSheet(); suggestions = null; render(); toast(b.dataset.state === 'lavado' ? 'Marcada en lavado' : b.dataset.state === 'guardada' ? 'Guardada de temporada' : 'Disponible de nuevo'); }
+    if (act === 'del-item') {
+      if (b.dataset.confirm) { const id = +b.dataset.id; state.items = state.items.filter(x => x.id !== id); await setPhoto(id, null); closeSheet(); suggestions = null; render(); toast('Prenda eliminada'); }
+      else { b.textContent = '¿Seguro? Tocá de nuevo para eliminar'; b.dataset.confirm = '1'; }
+    }
+    if (act === 'edit-item') addSheet(+b.dataset.id);
+    if (act === 'suggest-with') { const i = byId(+b.dataset.id); lookSheet({ [i.cat]: i.id }); }
+    if (act === 'clear-img') { syncForm(); form.photo = ''; form.imgUrl = ''; renderAddSheet(); }
+    if (act === 'fetch-link') fetchFromLink();
+    if (b.dataset.f || b.dataset.bf) {
+      const f = b.dataset.f || b.dataset.bf, v = b.dataset.v;
+      if (b.dataset.f) syncForm(); else form.name = sheetRoot.querySelector('#f-name')?.value ?? form.name;
+      if (f === 'season') { form.seasons = v === 'all' ? SEASONS.slice() : form.seasons.includes(v) ? form.seasons.filter(s => s !== v) : [...form.seasons, v]; }
+      else if (f === 'formal') form.formal = +v; else { form[f] = v; if (f === 'hue') form.hueTouched = true; }
+      if (b.dataset.f) renderAddSheet(); else rebatchChips();
+    }
+    if (act === 'save-item') {
+      syncForm(); form.name = form.name.trim();
+      if (!form.name) { toast('Ponele un nombre a la prenda'); return; }
+      if (!form.seasons.length) { toast('Elegí al menos una temporada'); return; }
+      if (form.link && !/^https?:\/\//i.test(form.link)) form.link = 'https://' + form.link;
+      const data = { name: form.name, cat: form.cat, hue: form.hue, seasons: form.seasons, formal: form.formal, link: form.link, price: form.price ? +form.price : 0, imgUrl: form.imgUrl || '' };
+      let id = form.id;
+      if (id) Object.assign(byId(id), data); else { id = state.nextId++; state.items.push({ id, state: 'ok', uses: 0, ...data }); }
+      await setPhoto(id, form.photo || null);
+      closeSheet(); suggestions = null; if (!form.id) state.onlySeason = false; render(); toast(form.id ? 'Cambios guardados' : 'Prenda agregada');
+    }
+    if (act === 'batch-classify') { batch.step = 'classify'; renderBatch(); setTimeout(() => sheetRoot.querySelector('#f-name')?.focus(), 50); }
+    if (act === 'batch-save') { batchSave(); setTimeout(() => sheetRoot.querySelector('#f-name')?.focus(), 50); }
+    if (act === 'batch-skip') { form.batchItem.done = true; renderBatch(); }
+    if (act === 'batch-end') { batch = null; closeSheet(); render(); }
+    if (b.dataset.pick) {
+      lookForm.name = sheetRoot.querySelector('#l-name')?.value ?? lookForm.name;
+      const cat = b.dataset.pick, id = +b.dataset.id;
+      lookForm.picks[cat] = lookForm.picks[cat] === id ? null : id;
+      if (cat === 'dress' && lookForm.picks.dress) { lookForm.picks.top = null; lookForm.picks.bottom = null; }
+      if ((cat === 'top' || cat === 'bottom') && lookForm.picks[cat]) lookForm.picks.dress = null;
+      renderLookSheet();
+    }
+    if (act === 'save-look' || act === 'wear-picks') {
+      const name = sheetRoot.querySelector('#l-name').value.trim() || 'Look sin nombre';
+      const items = CAT_ORDER.map(c => lookForm.picks[c]).filter(Boolean);
+      if (act === 'save-look') { state.looks.unshift({ id: 'l' + Date.now(), name, items }); closeSheet(); state.tab = 'looks'; render(); toast('Look guardado'); }
+      else { closeSheet(); wear(items); }
+    }
+    if (act === 'set-city') setCity();
+    if (act === 'export') exportAll();
+    if (act === 'load-demo') { closeSheet(); loadDemo(); }
+    if (act === 'wipe') {
+      if (b.dataset.confirm) { for (const i of state.items) await setPhoto(i.id, null); state = freshState(); suggestions = null; capResult = null; closeSheet(); render(); toast('Todo borrado'); }
+      else { b.textContent = '¿Seguro? Tocá de nuevo para borrar todo'; b.dataset.confirm = '1'; }
+    }
+  });
+  // keep batch chips in sync without losing the typed name
+  function rebatchChips() {
+    sheetRoot.querySelectorAll('[data-bf]').forEach(el => {
+      const f = el.dataset.bf, v = el.dataset.v;
+      const on = f === 'cat' ? form.cat === v : f === 'hue' ? form.hue === v : f === 'formal' ? form.formal === +v : v !== 'all' && form.seasons.includes(v);
+      el.classList.toggle('on', on);
+    });
+    const pv = sheetRoot.querySelector('.photo-box'); if (pv) pv.innerHTML = tile({ name: '', cat: form.cat, hue: form.hue, preview: form.photo }, false);
+    const hueLabel = sheetRoot.querySelector('.swatches + .muted'); if (hueLabel) hueLabel.textContent = form.hue;
+  }
+
+  // ---------- boot ----------
+  (async () => {
+    db = await openDb();
+    await dbAll();
+    render();
+    refreshWeather();
+    if ('serviceWorker' in navigator) window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    window.addEventListener('online', refreshWeather);
+  })();
+})();
+</script>
+</body>
+</html>
